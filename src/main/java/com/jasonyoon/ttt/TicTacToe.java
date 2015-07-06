@@ -72,6 +72,7 @@ public class TicTacToe {
         char player = 'X';
         int row, col;
 
+        //play at most 9 valid moves
         while(turnsPlayed < 9){
             if (player == 'X') {
                 System.out.println("Player X's turn: What's your move?");
@@ -85,8 +86,9 @@ public class TicTacToe {
                 if(makeMove(player, row, col)) {
                     displayBoard();
                     if(winner != '?') {
-                        //game finished, announce winner and exit
-                        break;
+                        //game finished, announce winner and return
+                        System.out.println(winner + " won!");
+                        return this.board;
                     }
                     player = (player == 'X') ? 'O' : 'X';
                     turnsPlayed++;
@@ -95,7 +97,7 @@ public class TicTacToe {
                 System.out.println("Please specify row and column in the following format: 'ROW' 'COL'");
             }
         }
-        System.out.println(winner + " won!");
+        System.out.println("It's a tie.");
         return this.board;
     }
 }
