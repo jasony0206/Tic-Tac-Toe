@@ -88,7 +88,7 @@ public class TicTacToeTest {
 
         String userInputString = "0 0\n0 1\n0 2\n1 0\n1 1\n1 2\n2 0\n2 1\n2 2\n";
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
-        char[][] expected = {{'X', 'O', 'X'}, {'O', 'X', 'O'}, {'X', 'O', 'X'}};
+        char[][] expected = {{'X', 'O', 'X'}, {'O', 'X', 'O'}, {'X', ' ', ' '}};
         assertTrue(Arrays.deepEquals(expected, ttt.playGame(is)));
     }
 
@@ -96,7 +96,7 @@ public class TicTacToeTest {
     public void takesMockPlayerInput() throws IOException{
         String userInputString = "0 0\n1 2\n0 1\n2 0\n0 2\n2 1\n1 0\n2 2\n1 1\n";
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
-        char[][] expected = {{'X', 'X', 'X'}, {'X', 'X', 'O'}, {'O', 'O', 'O'}};
+        char[][] expected = {{'X', 'X', 'X'}, {' ', ' ', 'O'}, {'O', ' ', ' '}};
         assertTrue(Arrays.deepEquals(expected, ttt.playGame(is)));
     }
 
