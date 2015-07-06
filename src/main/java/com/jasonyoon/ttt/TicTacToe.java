@@ -86,6 +86,7 @@ public class TicTacToe {
                 if(makeMove(player, row, col)) {
                     displayBoard();
                     if(winner != '?') {
+                        //game finished, announce winner and exit
                         break;
                     }
                     player = (player == 'X') ? 'O' : 'X';
