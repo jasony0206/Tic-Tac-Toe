@@ -4,11 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 public class TicTacToe {
 
-    private char[][] board;
+    private char[] board;
     private char winner = '?';
     private int turnsPlayed = 0;
 
@@ -17,7 +16,7 @@ public class TicTacToe {
         t.playGame(System.in);
     }
 
-    public char[][] getBoard(){
+    public char[] getBoard(){
         return board;
     }
 
@@ -26,51 +25,69 @@ public class TicTacToe {
     }
 
     public TicTacToe() {
-        board = new char[3][3];
+        board = new char[9];
         //logically unnecessary, but helps board interface stay "in place" by
         //initializing as ' ' rather than leaving it as a null character
-        for(char[] row : board) {
-            Arrays.fill(row, ' ');
+        for(int i = 0; i < 9; i++) {
+            board[i] = Character.forDigit(i + 1, 10);
         }
     }
 
     public void displayBoard() {
-        for(int i = 0; i < 3; i++) {
-            System.out.print("| " + board[i][0] + " | " + board[i][1] + " | " + board[i][2] + " |\n");
+        for(int i = 0; i < 9; i += 3) {
+            System.out.print("| " + board[i] + " | " + board[i + 1] + " | " + board[i + 2] + " |\n");
         }
         System.out.print("\n");
     }
 
-    public boolean makeMove(char player, int row, int col) {
-        //System.out.println("row:" + row + "col:" + col);
-        if(row < 0 || 2 < row || col < 0 || 2 < col) {
-            System.out.println("Row and column must be between 0 and 2 inclusive.");
+    public boolean isValidMove(int position) {
+        if (position < 1 || position > 9) {
+            System.out.println("Position must be between 1 and 9 inclusive.");
             return false;
-        } else if(board[row][col] != ' ') {
-            System.out.print(row + ", " + col + " is already filled.\n");
+        } else if(board[position - 1] != Character.forDigit(position, 10)) {
+            System.out.print("Position " + (position) + " is already filled.\n");
             return false;
         }
+        return true;
+    }
 
-        board[row][col] = player;
+    public boolean isWinningMove(char player, int position) {
+        return (completesRow(player, position) || completesCol(player, position) || completesDiagonal(player));
+    }
 
-        //check if this move finishes the game
-        if((board[row][0] == player && board[row][1] == player && board[row][2] == player)
-            || (board[0][col] == player && board[1][col] == player && board[2][col] == player)
-            || (board[0][0] == player && board[1][1] == player && board[2][2] == player)
-            || (board[0][2] == player && board[1][1] == player && board[2][0] == player)) {
+    private boolean completesRow(char player, int position) {
+        int row = (position - 1) / 3;
+        return board[row] == player && board[row + 1] == player && board[row + 2] == player;
+    }
+
+    private boolean completesCol(char player, int position) {
+        int col = (position - 1) % 3;
+        return board[col] == player && board[col + 3] == player && board[col + 6] == player;
+    }
+
+    private boolean completesDiagonal(char player) {
+        return (board[0] == player && board[4] == player && board[8] == player)
+                || (board[2] == player && board[4] == player && board[6] == player);
+    }
+
+    public boolean makeMove(char player, int position) {
+        if(!isValidMove(position)) {
+            return false;
+        }
+        board[position - 1] = player;
+        if(turnsPlayed >= 4 && isWinningMove(player, position)) {
             winner = player;
         }
         return true;
     }
 
-    public char[][] playGame(InputStream is) throws IOException{
-        System.out.println("Please specify the row and column in the following format: 'ROW' 'COL'\nRow and column must be between 0 and 2 inclusive.\nExample: 1 2\n");
+    public char[] playGame(InputStream is) throws IOException{
+        System.out.println("Please make a move by typing in the position specified on the grid.\nAny numbers following the first number will be ignored.");
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         this.displayBoard();
 
         String input;
         char player = 'X';
-        int row, col;
 
         //play at most 9 valid moves
         while(turnsPlayed < 9){
@@ -80,10 +97,8 @@ public class TicTacToe {
                 System.out.println("Player O's turn: What's your move?");
             }
 
-            if((input = br.readLine()) != null && input.length() >= 3) {
-                row = Character.getNumericValue(input.charAt(0));
-                col = Character.getNumericValue(input.charAt(2));
-                if(makeMove(player, row, col)) {
+            if((input = br.readLine()) != null && input.length() > 0) {
+                if(makeMove(player, Character.getNumericValue(input.charAt(0)))) {
                     displayBoard();
                     if(winner != '?') {
                         //game finished, announce winner and return
@@ -94,10 +109,10 @@ public class TicTacToe {
                     turnsPlayed++;
                 }
             } else {
-                System.out.println("Please specify row and column in the following format: 'ROW' 'COL'");
+                System.out.println("Please make a move");
             }
         }
-        System.out.println("It's a tie.");
+        System.out.println("It's a tie. BOOOOO");
         return this.board;
     }
 }

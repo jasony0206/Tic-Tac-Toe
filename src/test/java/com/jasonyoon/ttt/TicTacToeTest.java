@@ -21,7 +21,6 @@ public class TicTacToeTest {
     InputStream stdin;
     ByteArrayOutputStream consoleOutput;
 
-
     @Before
     public void setup() {
         ttt = new TicTacToe();
@@ -36,108 +35,168 @@ public class TicTacToeTest {
     }
 
     @Test
-    public void displaysEmptyBoard() {
+    public void testDisplayBoardWhenGameStartsShouldDisplayEmptyBoard() {
+        //GIVEN
         //redirect output so we can compare
         consoleOutput = new ByteArrayOutputStream();
         System.setOut(new PrintStream(consoleOutput));
-
-        String expectedOutput = "|   |   |   |\n|   |   |   |\n|   |   |   |\n\n";
+        String expectedOutput = "| 1 | 2 | 3 |\n| 4 | 5 | 6 |\n| 7 | 8 | 9 |\n\n";
+        //WHEN
         ttt.displayBoard();
+        //THEN
         assertEquals(expectedOutput, consoleOutput.toString());
     }
 
     @Test
-    public void makeMoveWorks() {
-        char[][] expected = {{' ', 'X', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
-        ttt.makeMove('X', 0, 1);
-        assertTrue(Arrays.deepEquals(expected, ttt.getBoard()));
-        expected[0][0] = 'O';
-        ttt.makeMove('O', 0, 0);
-        assertTrue(Arrays.deepEquals(expected, ttt.getBoard()));
+    public void testMakeMoveWhenXMakesMoveShouldPutX() {
+        //GIVEN board is empty
+        char[] expected = {'1', 'X', '3', '4', '5', '6', '7', '8', '9'};
+        //WHEN
+        ttt.makeMove('X', 2);
+        //THEN
+        assertTrue(Arrays.equals(expected, ttt.getBoard()));
     }
 
     @Test
-    public void displaysCompletedBoard() {
+    public void testMakeMoveWhenOMakesMoveShouldPutO() {
+        //GIVEN board is empty
+        char[] expected = {'O', '2', '3', '4', '5', '6', '7', '8', '9'};
+        //WHEN
+        ttt.makeMove('O', 1);
+        //THEN
+        assertTrue(Arrays.equals(expected, ttt.getBoard()));
+    }
+
+    @Test
+    public void testDisplayBoardWhenWeFillBoardShouldShowCompletedBoard() {
+        //GIVEN
         //redirect output so we can compare
         consoleOutput = new ByteArrayOutputStream();
         System.setOut(new PrintStream(consoleOutput));
-
         String expectedOutput = "| X | O | X |\n| O | X | O |\n| X | O | X |\n\n";
         fillBoard();
+        //WHEN
         ttt.displayBoard();
+        //THEN
         assertEquals(expectedOutput, consoleOutput.toString());
     }
 
     private void fillBoard() {
-        ttt.makeMove('X', 0, 0);
-        ttt.makeMove('O', 0, 1);
-        ttt.makeMove('X', 0, 2);
-        ttt.makeMove('O', 1, 0);
-        ttt.makeMove('X', 1, 1);
-        ttt.makeMove('O', 1, 2);
-        ttt.makeMove('X', 2, 0);
-        ttt.makeMove('O', 2, 1);
-        ttt.makeMove('X', 2, 2);
+        ttt.makeMove('X', 1);
+        ttt.makeMove('O', 2);
+        ttt.makeMove('X', 3);
+        ttt.makeMove('O', 4);
+        ttt.makeMove('X', 5);
+        ttt.makeMove('O', 6);
+        ttt.makeMove('X', 7);
+        ttt.makeMove('O', 8);
+        ttt.makeMove('X', 9);
     }
 
     @Test
-    public void playsAutomaticallyAlternating() throws IOException{
-        //redirect output so we can compare
+    public void testPlayGameWhenGameStartsShouldPlayAlternating() throws IOException{
+        //GIVEN
+        String userInputString = "1\n2\n3\n4\n5\n6\n7\n";
+        InputStream is = new ByteArrayInputStream(userInputString.getBytes());
+        char[] expected = {'X', 'O', 'X', 'O', 'X', 'O', 'X', '8', '9'};
+        //WHEN
+        ttt.playGame(is);
+        //THEN
+        assertTrue(Arrays.equals(expected, ttt.getBoard()));
+    }
+
+    @Test
+    public void testMakeMoveWhenAlreadyFilledShouldMessage() {
+        //GIVEN
         consoleOutput = new ByteArrayOutputStream();
         System.setOut(new PrintStream(consoleOutput));
+        ttt.makeMove('X', 3);
+        //WHEN
+        ttt.makeMove('O', 3);
+        //THEN
+        assertEquals("Position 3 is already filled.\n", consoleOutput.toString());
+    }
 
-        String userInputString = "0 0\n0 1\n0 2\n1 0\n1 1\n1 2\n2 0\n2 1\n2 2\n";
+    @Test
+    public void testPlayGameWhenThreeSingleRowShouldWin() throws IOException{
+        //GIVEN
+        String userInputString = "1\n7\n2\n8\n3\n";
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
-        char[][] expected = {{'X', 'O', 'X'}, {'O', 'X', 'O'}, {'X', ' ', ' '}};
-        assertTrue(Arrays.deepEquals(expected, ttt.playGame(is)));
-    }
-
-    @Test
-    public void takesMockPlayerInput() throws IOException{
-        String userInputString = "0 0\n1 2\n0 1\n2 0\n0 2\n2 1\n1 0\n2 2\n1 1\n";
-        InputStream is = new ByteArrayInputStream(userInputString.getBytes());
-        char[][] expected = {{'X', 'X', 'X'}, {' ', ' ', 'O'}, {'O', ' ', ' '}};
-        assertTrue(Arrays.deepEquals(expected, ttt.playGame(is)));
-    }
-
-    @Test
-    public void ifAlreadyFilledOutputMessage() {
-        consoleOutput = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(consoleOutput));
-        ttt.makeMove('X', 1, 1);
-        ttt.makeMove('O', 1, 1);
-        assertEquals("1, 1 is already filled.\n", consoleOutput.toString());
-    }
-
-    @Test
-    public void threeInSingleRowWins() {
-        ttt.makeMove('X', 0, 0);
-        ttt.makeMove('X', 0, 1);
-        ttt.makeMove('X', 0, 2);
+        //WHEN
+        ttt.playGame(is);
+        //THEN
         assertEquals('X', ttt.getWinner());
     }
 
     @Test
-    public void threeInSingleColumnWins() {
-        ttt.makeMove('Y', 0, 0);
-        ttt.makeMove('Y', 1, 0);
-        ttt.makeMove('Y', 2, 0);
-        assertEquals('Y', ttt.getWinner());
+    public void testPlayGameWhenThreeSingleColumnShouldWin() throws IOException{
+        //GIVEN
+        String userInputString = "1\n2\n4\n5\n7\n";
+        InputStream is = new ByteArrayInputStream(userInputString.getBytes());
+        //WHEN
+        ttt.playGame(is);
+        //THEN
+        assertEquals('X', ttt.getWinner());
     }
 
     @Test
-    public void threeInSingleDiagonalWins1() {
-        ttt.makeMove('Y', 0, 0);
-        ttt.makeMove('Y', 1, 1);
-        ttt.makeMove('Y', 2, 2);
-        assertEquals('Y', ttt.getWinner());
+    public void testPlayGameWhenThreeSingleDiagonalShouldWin1() throws IOException{
+        //GIVEN
+        String userInputString = "1\n7\n5\n8\n9\n";
+        InputStream is = new ByteArrayInputStream(userInputString.getBytes());
+        //WHEN
+        ttt.playGame(is);
+        //THEN
+        assertEquals('X', ttt.getWinner());
     }
 
     @Test
-    public void threeInSingleDiagonalWins2() {
-        ttt.makeMove('Y', 0, 2);
-        ttt.makeMove('Y', 1, 1);
-        ttt.makeMove('Y', 2, 0);
-        assertEquals('Y', ttt.getWinner());
+    public void testPlayGameWhenThreeSingleDiagonalShouldWin2() throws IOException{
+        //GIVEN
+        String userInputString = "3\n9\n5\n8\n7\n";
+        InputStream is = new ByteArrayInputStream(userInputString.getBytes());
+        //WHEN
+        ttt.playGame(is);
+        //THEN
+        assertEquals('X', ttt.getWinner());
     }
+
+    @Test
+    public void testIsValidMoveWhenSafeIndexingShouldReturnTrue() {
+        assertTrue(ttt.isValidMove(1));
+    }
+
+    @Test
+    public void testIsValidMoveWhenOutOfBoundShouldReturnFalse() {
+        assertFalse(ttt.isValidMove(10));
+    }
+
+    @Test
+    public void testIsValidMoveWhenAlreadyFilledShouldReturnFalse() {
+        //GIVEN
+        ttt.makeMove('X', 1);
+        //THEN
+        assertFalse(ttt.isValidMove(1));
+    }
+
+    @Test
+    public void testIsWinningMoveWhenRowIsFinishedShouldReturnTrue() {
+        //GIVEN
+        ttt.makeMove('X', 1);
+        ttt.makeMove('X', 2);
+        //WHEN
+        ttt.makeMove('X', 3);
+        //THEN
+        assertTrue(ttt.isWinningMove('X', 3));
+    }
+
+    @Test
+    public void testIsWinningMoveWhenNothingFinishedShouldReturnFalse() {
+        //WHEN
+        ttt.makeMove('X', 1);
+        //THEN
+        assertFalse(ttt.isWinningMove('X', 3));
+    }
+
+
 }
