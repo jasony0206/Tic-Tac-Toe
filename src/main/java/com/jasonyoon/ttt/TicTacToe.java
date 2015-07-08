@@ -1,51 +1,50 @@
 package com.jasonyoon.ttt;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 
 public class TicTacToe {
 
-    private char[] board;
+    private char[] grid;
     private char winner = '?';
     private int turnsPlayed = 0;
+    private InputStream is;
+    private Board board;
 
-    public static void main( String[] args ) throws IOException{
-        TicTacToe t = new TicTacToe();
-        t.playGame(System.in);
+    public static void main(String[] args) throws IOException{
+        TicTacToe t = new TicTacToe(System.in, new ConsoleBoard());
+        t.playGame();
     }
 
-    public char[] getBoard(){
-        return board;
+    public TicTacToe(InputStream is, Board board) {
+        grid = new char[9];
+        //logically unnecessary, but helps board interface stay "in place" by
+        //initializing as ' ' rather than leaving it as a null character
+        for(int i = 0; i < 9; i++) {
+            grid[i] = Character.forDigit(i + 1, 10);
+        }
+        this.is = is;
+        this.board = board;
+    }
+
+    public char[] getGrid(){
+        return grid;
     }
 
     public char getWinner() {
         return winner;
     }
 
-    public TicTacToe() {
-        board = new char[9];
-        //logically unnecessary, but helps board interface stay "in place" by
-        //initializing as ' ' rather than leaving it as a null character
-        for(int i = 0; i < 9; i++) {
-            board[i] = Character.forDigit(i + 1, 10);
-        }
-    }
-
-    public void displayBoard() {
-        for(int i = 0; i < 9; i += 3) {
-            System.out.print("| " + board[i] + " | " + board[i + 1] + " | " + board[i + 2] + " |\n");
-        }
-        System.out.print("\n");
+    public void displayGrid() {
+        board.printGrid(grid);
     }
 
     public boolean isValidMove(int position) {
         if (position < 1 || position > 9) {
-            System.out.println("Position must be between 1 and 9 inclusive.");
+            board.print("Position must be between 1 and 9 inclusive.");
             return false;
-        } else if(board[position - 1] != Character.forDigit(position, 10)) {
-            System.out.print("Position " + (position) + " is already filled.\n");
+        } else if(grid[position - 1] != Character.forDigit(position, 10)) {
+            board.print("Position " + (position) + " is already filled.");
             return false;
         }
         return true;
@@ -57,34 +56,35 @@ public class TicTacToe {
 
     private boolean completesRow(char player, int position) {
         int row = (position - 1) / 3;
-        return board[row] == player && board[row + 1] == player && board[row + 2] == player;
+        return grid[row] == player && grid[row + 1] == player && grid[row + 2] == player;
     }
 
     private boolean completesCol(char player, int position) {
         int col = (position - 1) % 3;
-        return board[col] == player && board[col + 3] == player && board[col + 6] == player;
+        return grid[col] == player && grid[col + 3] == player && grid[col + 6] == player;
     }
 
     private boolean completesDiagonal(char player) {
-        return (board[0] == player && board[4] == player && board[8] == player)
-                || (board[2] == player && board[4] == player && board[6] == player);
+        return (grid[0] == player && grid[4] == player && grid[8] == player)
+                || (grid[2] == player && grid[4] == player && grid[6] == player);
     }
 
     public boolean makeMove(char player, int position) {
         if(!isValidMove(position)) {
             return false;
         }
-        board[position - 1] = player;
+        grid[position - 1] = player;
         if(turnsPlayed >= 4 && isWinningMove(player, position)) {
             winner = player;
         }
         return true;
     }
 
-    public char[] playGame(InputStream is) throws IOException{
-        System.out.println("Please make a move by typing in the position specified on the grid.\nAny numbers following the first number will be ignored.");
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        this.displayBoard();
+    public char[] playGame() throws IOException{
+        String newline = System.getProperty("line.separator");
+        board.print("Please make a move by typing in the position specified on the grid." + newline + "Any numbers following the first number will be ignored.");
+        BufferedReader br = new BufferedReader(new InputStreamReader(this.is));
+        this.displayGrid();
 
         String input;
         char player = 'X';
@@ -92,27 +92,27 @@ public class TicTacToe {
         //play at most 9 valid moves
         while(turnsPlayed < 9){
             if (player == 'X') {
-                System.out.println("Player X's turn: What's your move?");
+                board.print("Player X's turn: What's your move?");
             } else {
-                System.out.println("Player O's turn: What's your move?");
+                board.print("Player O's turn: What's your move?");
             }
 
             if((input = br.readLine()) != null && input.length() > 0) {
                 if(makeMove(player, Character.getNumericValue(input.charAt(0)))) {
-                    displayBoard();
+                    displayGrid();
                     if(winner != '?') {
                         //game finished, announce winner and return
-                        System.out.println(winner + " won!");
-                        return this.board;
+                        board.print(winner + " won!");
+                        return this.grid;
                     }
                     player = (player == 'X') ? 'O' : 'X';
                     turnsPlayed++;
                 }
             } else {
-                System.out.println("Please make a move");
+                board.print("Please make a move");
             }
         }
-        System.out.println("It's a tie. BOOOOO");
-        return this.board;
+        board.print("It's a tie. BOOOOO");
+        return this.grid;
     }
 }
