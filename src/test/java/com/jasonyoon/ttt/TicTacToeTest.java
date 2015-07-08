@@ -20,10 +20,11 @@ public class TicTacToeTest {
     PrintStream stdout;
     InputStream stdin;
     ByteArrayOutputStream consoleOutput;
+    String newline = System.getProperty("line.separator");
 
     @Before
     public void setup() {
-        ttt = new TicTacToe();
+        ttt = new TicTacToe(System.in, new ConsoleBoard());
         stdin = System.in;
         stdout = System.out;
     }
@@ -40,9 +41,9 @@ public class TicTacToeTest {
         //redirect output so we can compare
         consoleOutput = new ByteArrayOutputStream();
         System.setOut(new PrintStream(consoleOutput));
-        String expectedOutput = "| 1 | 2 | 3 |\n| 4 | 5 | 6 |\n| 7 | 8 | 9 |\n\n";
+        String expectedOutput = "| 1 | 2 | 3 |" + newline + "| 4 | 5 | 6 |" + newline + "| 7 | 8 | 9 |" + newline + newline;
         //WHEN
-        ttt.displayBoard();
+        ttt.displayGrid();
         //THEN
         assertEquals(expectedOutput, consoleOutput.toString());
     }
@@ -54,7 +55,7 @@ public class TicTacToeTest {
         //WHEN
         ttt.makeMove('X', 2);
         //THEN
-        assertTrue(Arrays.equals(expected, ttt.getBoard()));
+        assertTrue(Arrays.equals(expected, ttt.getGrid()));
     }
 
     @Test
@@ -64,7 +65,7 @@ public class TicTacToeTest {
         //WHEN
         ttt.makeMove('O', 1);
         //THEN
-        assertTrue(Arrays.equals(expected, ttt.getBoard()));
+        assertTrue(Arrays.equals(expected, ttt.getGrid()));
     }
 
     @Test
@@ -73,10 +74,10 @@ public class TicTacToeTest {
         //redirect output so we can compare
         consoleOutput = new ByteArrayOutputStream();
         System.setOut(new PrintStream(consoleOutput));
-        String expectedOutput = "| X | O | X |\n| O | X | O |\n| X | O | X |\n\n";
+        String expectedOutput = "| X | O | X |" + newline + "| O | X | O |" + newline + "| X | O | X |" + newline + newline;
         fillBoard();
         //WHEN
-        ttt.displayBoard();
+        ttt.displayGrid();
         //THEN
         assertEquals(expectedOutput, consoleOutput.toString());
     }
@@ -100,9 +101,10 @@ public class TicTacToeTest {
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
         char[] expected = {'X', 'O', 'X', 'O', 'X', 'O', 'X', '8', '9'};
         //WHEN
-        ttt.playGame(is);
+        ttt = new TicTacToe(is, new ConsoleBoard());
+        ttt.playGame();
         //THEN
-        assertTrue(Arrays.equals(expected, ttt.getBoard()));
+        assertTrue(Arrays.equals(expected, ttt.getGrid()));
     }
 
     @Test
@@ -114,7 +116,7 @@ public class TicTacToeTest {
         //WHEN
         ttt.makeMove('O', 3);
         //THEN
-        assertEquals("Position 3 is already filled.\n", consoleOutput.toString());
+        assertEquals(String.format("Position 3 is already filled.%n"), consoleOutput.toString());
     }
 
     @Test
@@ -123,7 +125,8 @@ public class TicTacToeTest {
         String userInputString = "1\n7\n2\n8\n3\n";
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
         //WHEN
-        ttt.playGame(is);
+        ttt = new TicTacToe(is, new ConsoleBoard());
+        ttt.playGame();
         //THEN
         assertEquals('X', ttt.getWinner());
     }
@@ -134,7 +137,8 @@ public class TicTacToeTest {
         String userInputString = "1\n2\n4\n5\n7\n";
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
         //WHEN
-        ttt.playGame(is);
+        ttt = new TicTacToe(is, new ConsoleBoard());
+        ttt.playGame();
         //THEN
         assertEquals('X', ttt.getWinner());
     }
@@ -145,7 +149,8 @@ public class TicTacToeTest {
         String userInputString = "1\n7\n5\n8\n9\n";
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
         //WHEN
-        ttt.playGame(is);
+        ttt = new TicTacToe(is, new ConsoleBoard());
+        ttt.playGame();
         //THEN
         assertEquals('X', ttt.getWinner());
     }
@@ -156,7 +161,8 @@ public class TicTacToeTest {
         String userInputString = "3\n9\n5\n8\n7\n";
         InputStream is = new ByteArrayInputStream(userInputString.getBytes());
         //WHEN
-        ttt.playGame(is);
+        ttt = new TicTacToe(is, new ConsoleBoard());
+        ttt.playGame();
         //THEN
         assertEquals('X', ttt.getWinner());
     }
