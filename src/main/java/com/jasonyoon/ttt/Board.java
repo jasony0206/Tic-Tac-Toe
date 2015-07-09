@@ -1,12 +1,15 @@
 package com.jasonyoon.ttt;
 
 /**
- * Created by jason.yoon on 7/7/2015.
+ * Created by jason on 7/8/15.
  */
 public interface Board {
 
-    void print(String message);
+    boolean putMove(char player, int position);
 
-    void printGrid(char[] grid);
+    char getCell(int position);
 
+    boolean isValidMove(int position, StringBuilder errorMessage);
+
+    boolean isWinningMove(char player, int position);
 }

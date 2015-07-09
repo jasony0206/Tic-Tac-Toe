@@ -3,17 +3,15 @@ package com.jasonyoon.ttt;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.Console;
-
 /**
  * Created by jason.yoon on 7/8/2015.
  */
-public class ConsoleBoardTest {
-    private ConsoleBoard b;
+public class ConsoleOutputSystemTest {
+    private ConsoleOutputSystem b;
 
     @Before
     public void setup() {
-        b = new ConsoleBoard();
+        b = new ConsoleOutputSystem();
     }
 
     @Test
@@ -33,26 +31,19 @@ public class ConsoleBoardTest {
     }
 
     @Test
-    public void testPrintGridGivenEmptyGridShouldPrintEmptyGrid() {
-        //GIVEN
-        char[] emptyGrid = new char[9];
-        //WHEN
-        b.printGrid(emptyGrid);
-    }
-
-    @Test
     public void testPrintGridGivenInitializedGridShouldPrintInitializedGrid() {
         //GIVEN
-        char[] initializedGrid = {'1', '2', '3', '4', '5', '6', '7', '8' ,'9'};
+        Board board = new CharArrayBoard();
         //WHEN
-        b.printGrid(initializedGrid);
+        b.printGrid(board);
     }
 
     @Test
     public void testPrintGridGivenPartiallyFilledBoardShouldPrintIt() {
         //GIVEN
-        char[] partiallyFilledBoard = {'1', 'X', 'O', '4', '5', 'X', '7', '8' ,'O'};
+        Board board = new CharArrayBoard();
         //WHEN
-        b.printGrid(partiallyFilledBoard);
+        board.putMove('X', 1);
+        b.printGrid(board);
     }
 }
